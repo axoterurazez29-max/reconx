@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReconX Report — {{ target }}</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: #ffffff;
+  color: #1a1a1a;
+  line-height: 1.6;
+  padding: 40px 20px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.header {
+  border-bottom: 3px solid #000;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.header .brand {
+  font-size: 13px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+.header .brand strong {
+  color: #c0392b;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #666;
+}
+
+.meta span strong {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.summary {
+  background: #f8f8f8;
+  border-left: 4px solid #000;
+  padding: 20px 24px;
+  margin-bottom: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 20px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-item .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.summary-item .value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #000;
+}
+
+.section {
+  margin-bottom: 48px;
+  page-break-inside: avoid;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title .count {
+  font-size: 13px;
+  font-weight: 500;
+  color: #888;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  text-align: left;
+  padding: 10px 12px;
+  background: #fafafa;
+  border-bottom: 2px solid #e5e5e5;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+  word-break: break-word;
+}
+
+tr:hover {
+  background: #fafafa;
+}
+
+.status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+  font-size: 12px;
+  font-family: "SF Mono", Monaco, Consolas, monospace;
+}
+
+.status-2xx { background: #d4edda; color: #155724; }
+.status-3xx { background: #cce5ff; color: #004085; }
+.status-4xx { background: #fff3cd; color: #856404; }
+.status-5xx { background: #f8d7da; color: #721c24; }
+
+.severity {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.sev-critical { background: #c0392b; color: white; }
+.sev-high     { background: #e74c3c; color: white; }
+.sev-medium   { background: #f39c12; color: white; }
+.sev-low      { background: #3498db; color: white; }
+.sev-info     { background: #95a5a6; color: white; }
+
+.empty {
+  text-align: center;
+  padding: 30px;
+  color: #999;
+  font-style: italic;
+  background: #fafafa;
+  border-radius: 4px;
+}
+
+.url {
+  font-family: "SF Mono", Monaco, Consolas, monospace;
+  color: #0066cc;
+  font-size: 12px;
+}
+
+.mono {
+  font-family: "SF Mono", Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e5e5;
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+}
+
+.footer strong {
+  color: #c0392b;
+}
+
+@media print {
+  body { padding: 20px; }
+  .section { page-break-inside: avoid; }
+  tr:hover { background: none; }
+}
+
+@media (max-width: 600px) {
+  body { padding: 20px 12px; }
+  .header h1 { font-size: 22px; }
+  table { font-size: 12px; }
+  th, td { padding: 8px 6px; }
+  .summary { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="brand">⚡ Tools made by <strong>Kyoraku</strong></div>
+    <h1>ReconX Report — {{ target }}</h1>
+    <div class="meta">
+      <span><strong>Scan Time:</strong> {{ scan_time }}</span>
+      <span><strong>Framework:</strong> {{ framework }}</span>
+      <span><strong>Type:</strong> {{ target_type }}</span>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="summary-item">
+      <span class="label">Subdomains</span>
+      <span class="value">{{ counts.subdomain }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Open Ports</span>
+      <span class="value">{{ counts.portscan }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Live Hosts</span>
+      <span class="value">{{ counts.webprobe }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Directories</span>
+      <span class="value">{{ counts.dirbrute }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Vulnerabilities</span>
+      <span class="value">{{ counts.vulnscan }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Total Findings</span>
+      <span class="value">{{ total_findings }}</span>
+    </div>
+  </div>
+
+  {% if results.subdomain %}
+  <div class="section">
+    <div class="section-title">
+      <span>📡 Subdomains Found</span>
+      <span class="count">{{ results.subdomain|length }} result(s)</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th style="width:60%">Subdomain</th><th>IP Address</th></tr>
+      </thead>
+      <tbody>
+        {% for item in results.subdomain %}
+        <tr>
+          <td class="url">{{ item.subdomain }}</td>
+          <td class="mono">{{ item.ip or "—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if results.portscan %}
+  <div class="section">
+    <div class="section-title">
+      <span>🔌 Open Ports</span>
+      <span class="count">{{ results.portscan|length }} result(s)</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:100px">Port</th>
+          <th style="width:100px">Proto</th>
+          <th style="width:150px">Service</th>
+          <th>Banner</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in results.portscan %}
+        <tr>
+          <td class="mono"><strong>{{ item.port }}</strong></td>
+          <td class="mono">{{ item.protocol }}</td>
+          <td>{{ item.service }}</td>
+          <td class="mono">{{ item.banner or "—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if results.webprobe %}
+  <div class="section">
+    <div class="section-title">
+      <span>🌐 Live Web Hosts</span>
+      <span class="count">{{ results.webprobe|length }} result(s)</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:90px">Status</th>
+          <th>URL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in results.webprobe %}
+        <tr>
+          <td>
+            {% if item.status and item.status >= 200 and item.status < 300 %}
+              <span class="status status-2xx">{{ item.status }}</span>
+            {% elif item.status and item.status >= 300 and item.status < 400 %}
+              <span class="status status-3xx">{{ item.status }}</span>
+            {% elif item.status and item.status >= 400 and item.status < 500 %}
+              <span class="status status-4xx">{{ item.status }}</span>
+            {% elif item.status %}
+              <span class="status status-5xx">{{ item.status }}</span>
+            {% else %}
+              <span class="status">?</span>
+            {% endif %}
+          </td>
+          <td class="url">{{ item.url }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if results.dirbrute %}
+  <div class="section">
+    <div class="section-title">
+      <span>📁 Directories Found</span>
+      <span class="count">{{ results.dirbrute|length }} result(s)</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:90px">Status</th>
+          <th>URL</th>
+          <th style="width:100px">Length</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in results.dirbrute %}
+        <tr>
+          <td>
+            {% if item.status >= 200 and item.status < 300 %}
+              <span class="status status-2xx">{{ item.status }}</span>
+            {% elif item.status >= 300 and item.status < 400 %}
+              <span class="status status-3xx">{{ item.status }}</span>
+            {% elif item.status >= 400 and item.status < 500 %}
+              <span class="status status-4xx">{{ item.status }}</span>
+            {% else %}
+              <span class="status status-5xx">{{ item.status }}</span>
+            {% endif %}
+          </td>
+          <td class="url">{{ item.url }}</td>
+          <td class="mono">{{ item.length }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if results.vulnscan %}
+  <div class="section">
+    <div class="section-title">
+      <span>🛡️ Vulnerabilities Found</span>
+      <span class="count">{{ results.vulnscan|length }} result(s)</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px">Severity</th>
+          <th>Name</th>
+          <th>URL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in results.vulnscan %}
+        <tr>
+          <td>
+            <span class="severity sev-{{ item.severity }}">
+              {{ item.severity }}
+            </span>
+          </td>
+          <td>{{ item.name }}</td>
+          <td class="url">{{ item.url }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if results.osint %}
+  <div class="section">
+    <div class="section-title">
+      <span>🔍 OSINT Information</span>
+    </div>
+    {% for osint in results.osint %}
+      {% if osint.ip %}
+      <p style="margin-bottom:12px">
+        <strong>Resolved IP:</strong>
+        <span class="mono">{{ osint.ip }}</span>
+      </p>
+      {% endif %}
+
+      {% if osint.whois %}
+      <h4 style="margin:16px 0 8px;font-size:14px;color:#555;text-transform:uppercase;letter-spacing:1px">WHOIS</h4>
+      <table>
+        <tbody>
+          {% for key, value in osint.whois.items() %}
+          <tr>
+            <td style="width:200px"><strong>{{ key|replace("_", " ")|title }}</strong></td>
+            <td class="mono">{{ value }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+
+      {% if osint.dns %}
+      <h4 style="margin:16px 0 8px;font-size:14px;color:#555;text-transform:uppercase;letter-spacing:1px">DNS Records</h4>
+      <table>
+        <tbody>
+          {% for rtype, records in osint.dns.items() %}
+          <tr>
+            <td style="width:200px"><strong>{{ rtype }}</strong></td>
+            <td class="mono">{{ records|join(", ") }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if not results.subdomain and not results.portscan and not results.webprobe and not results.dirbrute and not results.vulnscan and not results.osint %}
+  <div class="empty">
+    No findings were collected. Try running with more modules.
+  </div>
+  {% endif %}
+
+  <div class="footer">
+    <p>
+      Report generated by <strong>ReconX v{{ version }}</strong>
+      — Powered by <strong>Kyoraku</strong>
+    </p>
+    <p style="margin-top:6px">{{ scan_time }}</p>
+  </div>
+
+</div>
+</body>
+</html>
